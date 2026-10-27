@@ -60,6 +60,13 @@ A CoreMini can apply only a linear conversion: a factor and an offset. If a STIM
 * Set the values with **Set Value** commands, choosing the MEP item's **Value** property in the [Expression Builder](../../../../../shared-features-in-vehicle-spy/shared-features-expression-builder.md#mep-memory-edit-protocol-properties). **Value** changes only Vehicle Spy's copy of the item, which the **XCP STIM** command sends. With **ECU Value**, each **Set Value** would also write the item to the ECU with a separate XCP download, which a STIM script does not need.
 * In a CoreMini, set the function block's [Timing Precision](../../function-block-start-tab.md#timing-precision) to **Microseconds** for fast STIM rates.
 
+**Note:** Avoid putting an MEP item in a DAQ list and in an XCP STIM table at the same time.
+
+* **Online:** the item has one value, updated by DAQ as well as by Set Value steps. XCP STIM sends the latest value, which may be the one just measured instead of the one you set.
+* **CoreMini:** the item keeps only the values your function blocks set. DAQ does not change it. Read the measured value from the DAQ channel instead.
+
+To measure a variable you are stimulating, add a second MEASUREMENT for the same address to the A2L file. DAQ one and stimulate the other.
+
 ### Example
 
 Figure 2 shows a function block that sends two STIM ODTs to an ECU every 2 ms. When it starts, it jumps to step 14, waits for 1.5 seconds, and goes back to step 2. Steps 2 to 5 set the starting values of the items. In the loop, steps 6 to 10 add 1 to each item with **Set Value**, steps 11 and 12 send **ODT0** and **ODT1** with **XCP STIM**, and step 13 repeats the loop. Step 12 has a periodic rate of 2 ms, so the loop runs once every 2 ms.
